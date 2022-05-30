@@ -3,7 +3,7 @@
 # from the top level of this repo.
 
 cmake -S . -B ./src/build
-# Todo: build the thing
+cmake --build ./build --config Debug --target ALL_BUILD -j 10 --
 
 # Create the flutter app
 flutter create app
