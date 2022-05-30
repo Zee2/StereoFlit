@@ -2,7 +2,6 @@
 # Should cmake all the things, as well as spin up a flutter app and copy in the main.dart
 # from the top level of this repo.
 
-cmake -S . -B ./src/build
 cmake --build ./build --config Debug --target ALL_BUILD -j 10 --
 
 # Create the flutter app
