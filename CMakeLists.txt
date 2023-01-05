@@ -5,7 +5,6 @@ cmake_minimum_required(VERSION 3.11)
 project(flutterkit_embedder VERSION "0.1.0" LANGUAGES CXX C)
 
 # Fancy new cpp, please
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++20" )
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
@@ -16,7 +15,7 @@ set(SK_BUILD_SHARED_LIBS OFF CACHE INTERNAL "")
 FetchContent_Declare(
   StereoKitC
   GIT_REPOSITORY https://github.com/StereoKit/StereoKit.git
-  GIT_TAG        v0.3.5
+  GIT_TAG        v0.3.6
 )
 FetchContent_MakeAvailable(StereoKitC)
 
@@ -27,15 +26,20 @@ FetchContent_MakeAvailable(StereoKitC)
 # Todo: make **not** windows-x64...
 FetchContent_Declare(
   Flutter
-  URL https://storage.googleapis.com/flutter_infra_release/flutter/caaafc5604ee9172293eb84a381be6aadd660317/windows-x64/windows-x64-embedder.zip
+  URL https://storage.googleapis.com/flutter_infra_release/flutter/3316dd8728419ad3534e3f6112aa6291f587078a/windows-x64/windows-x64-embedder.zip
 )
 FetchContent_MakeAvailable(Flutter)
 
 # We force OpenGL here because Flutter doesn't speak DirectX
 add_definitions("-DSKG_FORCE_OPENGL")
 
+include_directories(
+  src
+)
+
 # Add source files to our target executable
 add_executable( flutterkit_embedder
+  src/flutter_surface.cpp
   src/main.cpp
 )
 
