@@ -8,6 +8,7 @@
 #include <filesystem>
 using namespace sk;
 
+FlutterEngine engine;
 
 double dpi = 2.0;
 pose_t windowPose = pose_identity;
@@ -42,104 +43,105 @@ bool FileExists(std::string filename) {
     }
 }
 
-// void OnVsync(intptr_t baton) {
-//     std::chrono::nanoseconds current_time =
-//         std::chrono::nanoseconds(FlutterEngineGetCurrentTime());
-//     std::chrono::nanoseconds frame_interval = std::chrono::nanoseconds((long)((1/60.0) * 1000000000.0));
-//     FlutterEngineOnVsync(engine, baton,
-//         current_time.count() + frame_interval.count(),
-//         current_time.count() + (frame_interval * 2).count());
-// }
+void OnVsync(intptr_t baton) {
+    std::chrono::nanoseconds current_time =
+        std::chrono::nanoseconds(FlutterEngineGetCurrentTime());
+    std::chrono::nanoseconds frame_interval = std::chrono::nanoseconds((long)((1/60.0) * 1000000000.0));
+    FlutterEngineOnVsync(engine, baton,
+        current_time.count() + frame_interval.count(),
+        current_time.count() + (frame_interval * 2).count());
+}
 
-// bool RunFlutter(const std::string& project_path,
-//                 const std::string& icudtl_path) {
+bool RunFlutter(const std::string& project_path,
+                const std::string& icudtl_path) {
 
-//     std::cout << "cwd = " << std::filesystem::current_path() << std::endl;
+    std::cout << "cwd = " << std::filesystem::current_path() << std::endl;
 
-//     // Build our Flutter renderer config.
-//     FlutterRendererConfig config = {};
+    // Build our Flutter renderer config.
+    FlutterRendererConfig config = {};
 
-//     render_surface = (color32*)malloc(sizeof(color32) * 512 * 512);
+    render_surface = (color32*)malloc(sizeof(color32) * 512 * 512);
 
-//     config.type = kSoftware;
-//     config.software.struct_size = sizeof(FlutterSoftwareRendererConfig);
-//     config.software.surface_present_callback = [](void* user_data,
-//                                                 const void* allocation,
-//                                                 size_t row_bytes,
-//                                                 size_t height) {
-        
-//         memcpy(render_surface, allocation, row_bytes * height);
-//         return true;
-//     };
+    config.type = kSoftware;
+    config.software.struct_size = sizeof(FlutterSoftwareRendererConfig);
+    config.software.surface_present_callback = [](void* user_data,
+                                                const void* allocation,
+                                                size_t row_bytes,
+                                                size_t height) {
+        std::cout << "Blit" << std::endl;
+        memcpy(render_surface, allocation, row_bytes * height);
+        return true;
+    };
 
-//     std::string assets_path = project_path + "/build/flutter_assets";
-//     std::string blob_path = assets_path + "/kernel_blob.bin";
+    std::string assets_path = project_path + "/build/flutter_assets";
+    std::string blob_path = assets_path + "/kernel_blob.bin";
 
-//     std::cout << "Blob path: " << blob_path << std::endl;
+    std::cout << "Blob path: " << blob_path << std::endl;
 
-//     if (FileExists(blob_path))
-//     {
-//         std::cout << "Found Flutter kernel blob inside flutter project at " << blob_path << std::endl;
-//     }
-//     else
-//     {
-//         std::cout << "Couldn't find kernel blob, Flutter will complain about this! It probably needs an absolute path to the project. (Looked at: " + blob_path << ")" << std::endl;
-//     }
+    if (FileExists(blob_path))
+    {
+        std::cout << "Found Flutter kernel blob inside flutter project at " << blob_path << std::endl;
+    }
+    else
+    {
+        std::cout << "Couldn't find kernel blob, Flutter will complain about this! It probably needs an absolute path to the project. (Looked at: " + blob_path << ")" << std::endl;
+    }
     
-//     FlutterProjectArgs args = {
-//         .struct_size = sizeof(FlutterProjectArgs),
-//         .assets_path = assets_path.c_str(),
-//         .icu_data_path = icudtl_path.c_str(),  // Find this in your bin/cache directory.
-//         // .compositor = &compositor
-//         .vsync_callback = [](void* user_data, intptr_t baton) -> void {
-//             OnVsync(baton);
-//         }
-//     };
+    FlutterProjectArgs args = {
+        .struct_size = sizeof(FlutterProjectArgs),
+        .assets_path = assets_path.c_str(),
+        .icu_data_path = icudtl_path.c_str(),  // Find this in your bin/cache directory.
+        // .compositor = &compositor
+        .vsync_callback = [](void* user_data, intptr_t baton) -> void {
+            std::cout << "Vsync" << std::endl;
+            OnVsync(baton);
+        }
+    };
 
-//     // FlutterEngine engine = nullptr;
-//     FlutterEngineResult result =
-//         FlutterEngineRun(FLUTTER_ENGINE_VERSION, &config,  // renderer
-//                         &args, nullptr, &engine);
+    // FlutterEngine engine = nullptr;
+    FlutterEngineResult result =
+        FlutterEngineRun(FLUTTER_ENGINE_VERSION, &config,  // renderer
+                        &args, nullptr, &engine);
                         
-//     if (result != kSuccess || engine == nullptr) {
-//         std::cout << "Could not run the Flutter Engine." << std::endl;
-//         return false;
-//     }
+    if (result != kSuccess || engine == nullptr) {
+        std::cout << "Could not run the Flutter Engine." << std::endl;
+        return false;
+    }
 
-//     FlutterEngineDisplay display = {};
-//     display.struct_size = sizeof(FlutterEngineDisplay);
-//     display.display_id = 0;
-//     display.single_display = true;
-//     display.refresh_rate = 60.0;
+    FlutterEngineDisplay display = {};
+    display.struct_size = sizeof(FlutterEngineDisplay);
+    display.display_id = 0;
+    display.single_display = true;
+    display.refresh_rate = 60.0;
 
-//     std::vector<FlutterEngineDisplay> displays = {display};
-//     FlutterEngineNotifyDisplayUpdate(engine,
-//                                         kFlutterEngineDisplaysUpdateTypeStartup,
-//                                         displays.data(), displays.size());
+    std::vector<FlutterEngineDisplay> displays = {display};
+    FlutterEngineNotifyDisplayUpdate(engine,
+                                        kFlutterEngineDisplaysUpdateTypeStartup,
+                                        displays.data(), displays.size());
 
-//     FlutterWindowMetricsEvent event = {};
-//     event.struct_size = sizeof(event);
-//     event.width = 512;
-//     event.height = 512;
-//     event.pixel_ratio = 2.0;
-//     FlutterEngineSendWindowMetricsEvent(
-//         engine,
-//         &event);
+    FlutterWindowMetricsEvent event = {};
+    event.struct_size = sizeof(event);
+    event.width = 512;
+    event.height = 512;
+    event.pixel_ratio = 2.0;
+    FlutterEngineSendWindowMetricsEvent(
+        engine,
+        &event);
 
-//     return true;
-// }
+    return true;
+}
 
-// void SendDPIUpdate(double pixel_ratio)
-// {
-//     FlutterWindowMetricsEvent event = {};
-//     event.struct_size = sizeof(event);
-//     event.width = 512;
-//     event.height = 512;
-//     event.pixel_ratio = pixel_ratio;
-//     FlutterEngineSendWindowMetricsEvent(
-//         engine,
-//         &event);
-// }
+void SendDPIUpdate(double pixel_ratio)
+{
+    FlutterWindowMetricsEvent event = {};
+    event.struct_size = sizeof(event);
+    event.width = 512;
+    event.height = 512;
+    event.pixel_ratio = pixel_ratio;
+    FlutterEngineSendWindowMetricsEvent(
+        engine,
+        &event);
+}
 
 
 
@@ -165,7 +167,7 @@ touch_point_t TouchPoint(bounds_t bounds, handed_ handedness)
     };
 }
 
-FlutterSurface* flutterSurface;
+// FlutterSurface* flutterSurface;
 
 int main(int argc, const char* argv[]) {
 
@@ -188,18 +190,18 @@ int main(int argc, const char* argv[]) {
 
     std::cout << "Booting Flutter app at path: " << flutter_project_path << std::endl;
 
-    flutterSurface = new FlutterSurface(
-        1024, 1024,
-        2.0,
-        flutter_project_path,
-        flutter_icudtl_path
-    );
+    // flutterSurface = new FlutterSurface(
+    //     1024, 1024,
+    //     2.0,
+    //     flutter_project_path,
+    //     flutter_icudtl_path
+    // );
 
     // Set up the texture we'll be blitting to.
     // tex_type_dynamic for software rendering for now.
     flutter_texture = sk::tex_create(tex_type_dynamic, tex_format_rgba32);
 
-    // RunFlutter(flutter_project_path, flutter_icudtl_path);
+    RunFlutter(flutter_project_path, flutter_icudtl_path);
 
     quad_mesh = mesh_find(default_id_mesh_quad);
     cube_mesh = mesh_gen_rounded_cube(vec3_one * 0.1f, 0.02f, 4);
@@ -211,11 +213,18 @@ int main(int argc, const char* argv[]) {
         render_add_mesh(cube_mesh, cube_mat, matrix_identity);
         ui_handle_end();
 
+        // sk::tex_set_colors(
+        //     flutter_texture,
+        //     (int32_t)(flutterSurface->GetPixelWidth()),
+        //     (int32_t)(flutterSurface->GetPixelHeight()),
+        //     flutterSurface->GetRenderSurface());
+
         sk::tex_set_colors(
             flutter_texture,
-            (int32_t)(flutterSurface->GetPixelWidth()),
-            (int32_t)(flutterSurface->GetPixelHeight()),
-            flutterSurface->GetRenderSurface());
+            512,
+            512,
+            render_surface
+        );
 
         ui_window_begin("Flutter", windowPose, vec2_one * 0.3f);
 
@@ -233,17 +242,38 @@ int main(int argc, const char* argv[]) {
         if (press_state & button_state_just_active)
         {
             std::cout << "Press down!" << std::endl;
-            flutterSurface->SendPointerEvent(touch, kDown);
+            // flutterSurface->SendPointerEvent(touch, kDown);
+            FlutterPointerEvent event = {};
+            event.struct_size = sizeof(event);
+            event.phase = kDown;
+            event.x = touch.pos.x;
+            event.y = touch.pos.y;
+            event.timestamp = FlutterEngineGetCurrentTime();
+            FlutterEngineSendPointerEvent(engine, &event, 1);
         }
         if (press_state & button_state_active)
         {
             std::cout << "Move!" << std::endl;
-            flutterSurface->SendPointerEvent(touch, kMove);
+            // flutterSurface->SendPointerEvent(touch, kMove);
+            FlutterPointerEvent event = {};
+            event.struct_size = sizeof(event);
+            event.phase = kMove;
+            event.x = touch.pos.x;
+            event.y = touch.pos.y;
+            event.timestamp = FlutterEngineGetCurrentTime();
+            FlutterEngineSendPointerEvent(engine, &event, 1);
         }
         if (press_state & button_state_just_inactive)
         {
             std::cout << "Up!" << std::endl;
-            flutterSurface->SendPointerEvent(touch, kUp);
+            // flutterSurface->SendPointerEvent(touch, kUp);
+            FlutterPointerEvent event = {};
+            event.struct_size = sizeof(event);
+            event.phase = kUp;
+            event.x = touch.pos.x;
+            event.y = touch.pos.y;
+            event.timestamp = FlutterEngineGetCurrentTime();
+            FlutterEngineSendPointerEvent(engine, &event, 1);
         }
 
         // ui_label("Pixel ratio (dpi)");
@@ -256,7 +286,8 @@ int main(int argc, const char* argv[]) {
 	});
 
     tex_release(flutter_texture);
-    free(flutterSurface);
+    // free(flutterSurface);
+    free(render_surface);
 
     return 0;
 }
