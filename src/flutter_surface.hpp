@@ -12,7 +12,9 @@ static_assert(FLUTTER_ENGINE_VERSION == 1,
               "before updating this assertion");
 
 typedef struct {
+    // The normalized 0..1 position of the touch point.
     sk::vec2 pos;
+    // The normalized 0..1 radius of the touch point.
     float radius;
 } touch_point_t;
 
@@ -36,9 +38,17 @@ class FlutterSurface
                        const std::string& project_path,
                        const std::string& icudtl_path);
         ~FlutterSurface();
+
+        // Obtain a handle to the underlying RGBA32 buffer.
         sk::color32* GetRenderSurface() { return render_surface; }
+
+        // Dispatch a pointer event to the Flutter engine.
         void SendPointerEvent(touch_point_t touchPoint, FlutterPointerPhase phase);
+
+        // Returns the width (in physical pixels) of the underlying RGBA32 buffer.
         size_t GetPixelWidth() { return pixel_width; }
+
+        // Obtain the height (in physical pixels) of the underlying RGBA32 buffer.
         size_t GetPixelHeight() { return pixel_height; }
 };
 

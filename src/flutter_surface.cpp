@@ -34,9 +34,7 @@ FlutterSurface::FlutterSurface(size_t pixel_width, size_t pixel_height,
                                                 size_t height) {
         // Can't capture `this` in a SoftwareSurfacePresentCallback lambda.
         // We'll pass `this` around as our user_data baton.
-        std::cout << "Blit!" << std::endl;
         FlutterSurface* surface = (FlutterSurface*)user_data;
-        std::cout << "Blit Surface ptr: " << surface << std::endl;
         memcpy(surface->render_surface, allocation, row_bytes * height);
         return true;
     };
@@ -86,13 +84,6 @@ FlutterSurface::FlutterSurface(size_t pixel_width, size_t pixel_height,
     event.height = pixel_height;
     event.pixel_ratio = 2.0;
 
-    // FlutterWindowMetricsEvent window_metrics = {
-    //     .struct_size = sizeof(window_metrics),
-    //     .width = (size_t)resolution.x,
-    //     .height = (size_t)resolution.y,
-    //     .pixel_ratio = pixel_ratio
-    // };
-
     result = FlutterEngineSendWindowMetricsEvent(engine, &event);
     if (result != kSuccess) {
         std::cout << "Failed to send window metrics event: " << result << std::endl;
@@ -111,8 +102,8 @@ void FlutterSurface::SendPointerEvent(touch_point_t touchPoint, FlutterPointerPh
     FlutterPointerEvent event = {};
     event.struct_size = sizeof(event);
     event.phase = phase;
-    event.x = touchPoint.pos.x;
-    event.y = touchPoint.pos.y;
+    event.x = touchPoint.pos.x * pixel_width;
+    event.y = touchPoint.pos.y * pixel_height;
     event.timestamp = FlutterEngineGetCurrentTime();
     FlutterEngineSendPointerEvent(engine, &event, 1);
 }
