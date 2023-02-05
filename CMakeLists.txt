@@ -15,7 +15,7 @@ set(SK_BUILD_SHARED_LIBS OFF CACHE INTERNAL "")
 FetchContent_Declare(
   StereoKitC
   GIT_REPOSITORY https://github.com/StereoKit/StereoKit.git
-  GIT_TAG        v0.3.6
+  GIT_TAG        66b4036febabcd11790bf390391871c077402bc5
 )
 FetchContent_MakeAvailable(StereoKitC)
 
@@ -33,7 +33,7 @@ FetchContent_MakeAvailable(Flutter)
 # We force OpenGL here because Flutter doesn't speak DirectX
 add_definitions("-DSKG_FORCE_OPENGL")
 
-include_directories(
+include_directories(  
   src
 )
 
