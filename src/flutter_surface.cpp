@@ -235,7 +235,8 @@ void FlutterSurface::SendPointerEvent(touch_point_t touchPoint, FlutterPointerPh
     event.phase = phase;
     event.x = touchPoint.pos.x * pixel_width;
     event.y = touchPoint.pos.y * pixel_height;
-    event.timestamp = FlutterEngineGetCurrentTime() + time_offset;
+    auto now_ns = std::chrono::nanoseconds(FlutterEngineGetCurrentTime());
+    event.timestamp = std::chrono::duration_cast<std::chrono::microseconds>(now_ns).count();
 
     // We're emulating touchscreen input right now. This has the advantage
     // of proper drag-scrolling, but the disadvantage of not issuing any hover events. :(
