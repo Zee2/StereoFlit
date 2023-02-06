@@ -1,8 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart'
-    show debugDefaultTargetPlatformOverride;
-import 'dart:ui';
-import 'dart:developer';
 
 void main() {
   // This affects things like whether scrollbars appear, etc
@@ -31,17 +27,36 @@ class AppTile extends StatelessWidget{
   @override
   Widget build(BuildContext context) {
     return Container(
+      
       padding: const EdgeInsets.all(5),
-      child: AspectRatio(
-        aspectRatio: 1,
-        child: ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: color,
-            shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(20.0))),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        // mainAxisAlignment: MainAxisAlignment.center,
+        // crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            child: AspectRatio(
+              aspectRatio: 1,
+              child: FittedBox(
+                fit: BoxFit.fill,
+                child: Container(
+                  width: 64,
+                  height: 64,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: color,
+                      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(20.0))),
+                    ),
+                    onPressed: () { },
+                    child: Icon(icon, color: Colors.white, )
+                  ),
+                )
+              )
+            )
           ),
-          onPressed: () { },
-          child: Icon(icon, color: Colors.white, )
-        )
+          const SizedBox(height: 5),
+          Text(title, style: const TextStyle(color: Colors.white), textAlign: TextAlign.center)
+        ]
       )
     );
   }
@@ -55,6 +70,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       // scrollBehavior: MyCustomScrollBehavior(), // for "mouse" (i.e., vr) scrolling
+      debugShowCheckedModeBanner: false, // Building kernel_blobs and embedding always shows the debug banner
       title: 'Flutter Demo',
       theme: ThemeData(
         // This is the theme of your application.
@@ -115,17 +131,21 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: Theme.of(context).shadowColor.withAlpha(200),
+    return Scaffold(
+      backgroundColor: Colors.black.withAlpha(0),
+      body: Container(
+      // color: Colors.white,
       child: ListView.builder(
-        padding: const EdgeInsets.all(2.5),
+        padding: const EdgeInsets.all(5),
         scrollDirection: Axis.horizontal,
+        shrinkWrap: true,
         itemCount: 10,
         physics: const BouncingScrollPhysics(),
         itemBuilder: (BuildContext context, int index) {
           return widget.appTiles[index % widget.appTiles.length];
         }
       )
+    )
     );
   }
 }
