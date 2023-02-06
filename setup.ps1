@@ -4,10 +4,7 @@
 
 cmake --build ./build --config Debug --target ALL_BUILD -j 10 --
 
-# Create the flutter app
-flutter create app
-Remove-Item app/lib/main.dart
-Copy-Item main.dart app/lib/main.dart
+# Build the flutter app
 Set-Location app
 flutter build bundle
 Set-Location ..
