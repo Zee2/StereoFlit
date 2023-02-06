@@ -1,6 +1,6 @@
 # StereoFlit
 
-Stereoflit is an experimental Flutter embedder for [StereoKit](http://www.stereokit.net), the code-first Mixed Reality engine. StereoFlit allows you to run and embed a pre-bundled Dart+Flutter application as a worldspace UI layer within your StereoKit app. 
+StereoFlit is an experimental Flutter embedder for [StereoKit](http://www.stereokit.net), the code-first Mixed Reality engine. StereoFlit allows you to run and embed a pre-bundled Dart+Flutter application as a worldspace UI layer within your StereoKit app. 
 
 <p align="middle">
 <img src="https://user-images.githubusercontent.com/5544935/216882882-c8b0b8fb-ad3d-4ed7-9da8-7d5287e78775.png" width=40%/>
