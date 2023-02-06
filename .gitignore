@@ -33,6 +33,7 @@
 
 # Build stuff
 src/build
+out
 
 # Miscellaneous
 *.class
