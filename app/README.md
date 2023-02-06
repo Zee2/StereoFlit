@@ -1,0 +1,1 @@
+This is the Flutter project that is compiled into a bundle/snapshot and embedded within the StereoKit app.

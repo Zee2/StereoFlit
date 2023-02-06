@@ -95,6 +95,7 @@ FlutterSurface::FlutterSurface(const char* id, size_t pixel_width, size_t pixel_
     texture = sk::tex_create(sk::tex_type_dynamic, sk::tex_format_bgra32);
     quad_mesh = sk::mesh_find(sk::default_id_mesh_quad);
     quad_mat = sk::material_copy(sk::material_find(sk::default_id_material));
+    sk::material_set_transparency(quad_mat, sk::transparency_blend);
     sk::material_set_texture(quad_mat, "diffuse", texture);
 }
 
@@ -115,9 +116,6 @@ void FlutterSurface::Draw(sk::bounds_t bounds)
             (int32_t)(pixel_height),
             render_surface);
 
-    
-    // Draw the surface.
-    render_add_mesh(quad_mesh, quad_mat, matrix_ts(bounds.center, bounds.dimensions));
     
     sk::button_state_ hover_state;
     sk::button_state_ click_state;
@@ -142,6 +140,9 @@ void FlutterSurface::Draw(sk::bounds_t bounds)
 
     // Pop/restore the old UI settings.
     sk::ui_settings(prev_settings);
+    
+    // Draw the surface.
+    render_add_mesh(quad_mesh, quad_mat, matrix_ts(bounds.center, bounds.dimensions));
     
     if (sk::ui_last_element_hand_used(sk::handed_right) & sk::button_state_active)
     {
@@ -248,4 +249,20 @@ void FlutterSurface::SendPointerEvent(touch_point_t touchPoint, FlutterPointerPh
     // event.buttons = (phase == kDown || phase == kMove || phase == kPanZoomStart || phase == kPanZoomUpdate || phase == kPanZoomEnd) ? kFlutterPointerButtonMousePrimary : 0;
     event.buttons = 0;
     FlutterEngineSendPointerEvent(engine, &event, 1);
+}
+
+void FlutterSurface::SetPixelRatio(double ratio)
+{
+    pixel_ratio = ratio;
+
+    FlutterWindowMetricsEvent event = {};
+    event.struct_size = sizeof(event);
+    event.width = pixel_width;
+    event.height = pixel_height;
+    event.pixel_ratio = pixel_ratio;
+
+    auto result = FlutterEngineSendWindowMetricsEvent(engine, &event);
+    if (result != kSuccess) {
+        std::cout << "Failed to send window metrics event: " << result << std::endl;
+    }
 }

@@ -1,8 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart'
-    show debugDefaultTargetPlatformOverride;
-import 'dart:ui';
-import 'dart:developer';
 
 void main() {
   // This affects things like whether scrollbars appear, etc
@@ -21,6 +17,51 @@ void main() {
 //   };
 // }
 
+class AppTile extends StatelessWidget{
+  const AppTile({required this.icon, required this.title, required this.color});
+
+  final IconData icon;
+  final String title;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      
+      padding: const EdgeInsets.all(5),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        // mainAxisAlignment: MainAxisAlignment.center,
+        // crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            child: AspectRatio(
+              aspectRatio: 1,
+              child: FittedBox(
+                fit: BoxFit.fill,
+                child: Container(
+                  width: 64,
+                  height: 64,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: color,
+                      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(20.0))),
+                    ),
+                    onPressed: () { },
+                    child: Icon(icon, color: Colors.white, )
+                  ),
+                )
+              )
+            )
+          ),
+          const SizedBox(height: 5),
+          Text(title, style: const TextStyle(color: Colors.white), textAlign: TextAlign.center)
+        ]
+      )
+    );
+  }
+}
+
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
 
@@ -29,6 +70,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       // scrollBehavior: MyCustomScrollBehavior(), // for "mouse" (i.e., vr) scrolling
+      debugShowCheckedModeBanner: false, // Building kernel_blobs and embedding always shows the debug banner
       title: 'Flutter Demo',
       theme: ThemeData(
         // This is the theme of your application.
@@ -61,6 +103,14 @@ class MyHomePage extends StatefulWidget {
 
   final String title;
 
+  final List<AppTile> appTiles = const [
+    AppTile(icon: Icons.settings, title: 'Settings', color: Colors.blueGrey),
+    AppTile(icon: Icons.airline_seat_flat, title: 'Flights', color: Colors.cyan),
+    AppTile(icon: Icons.account_balance_wallet, title: 'Wallet', color: Colors.green),
+    AppTile(icon: Icons.account_balance, title: 'Bank', color: Colors.orange),
+    AppTile(icon: Icons.account_circle, title: 'Profile', color: Colors.purple)
+  ];
+
   @override
   State<MyHomePage> createState() => _MyHomePageState();
 }
@@ -81,64 +131,22 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
-      appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
-      ),
-      body: ListView.builder(
-        itemCount: 100,
+      backgroundColor: Colors.black.withAlpha(0),
+      body: Container(
+      // color: Colors.white,
+      child: ListView.builder(
+        padding: const EdgeInsets.all(5),
+        scrollDirection: Axis.horizontal,
+        shrinkWrap: true,
+        itemCount: 10,
         physics: const BouncingScrollPhysics(),
         itemBuilder: (BuildContext context, int index) {
-            return ListTile(
-                leading: const Icon(Icons.list),
-                title: Text("List item $index, counter = ${counters[index]}"),
-                trailing: ElevatedButton(onPressed: () { _incrementCounter(index); }, child: Text("Button")));
-          })
-      );
-    //   body: Center(
-    //     // Center is a layout widget. It takes a single child and positions it
-    //     // in the middle of the parent.
-    //     child: Column(
-    //       // Column is also a layout widget. It takes a list of children and
-    //       // arranges them vertically. By default, it sizes itself to fit its
-    //       // children horizontally, and tries to be as tall as its parent.
-    //       //
-    //       // Invoke "debug painting" (press "p" in the console, choose the
-    //       // "Toggle Debug Paint" action from the Flutter Inspector in Android
-    //       // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-    //       // to see the wireframe for each widget.
-    //       //
-    //       // Column has various properties to control how it sizes itself and
-    //       // how it positions its children. Here we use mainAxisAlignment to
-    //       // center the children vertically; the main axis here is the vertical
-    //       // axis because Columns are vertical (the cross axis would be
-    //       // horizontal).
-    //       mainAxisAlignment: MainAxisAlignment.center,
-    //       children: <Widget>[
-    //         const Text(
-    //           'You have pushed the button this many times:',
-    //         ),
-    //         Text(
-    //           '$_counter',
-    //           style: Theme.of(context).textTheme.headline4,
-    //         ),
-    //       ],
-    //     ),
-    //   ),
-    //   floatingActionButton: FloatingActionButton(
-    //     onPressed: _incrementCounter,
-    //     tooltip: 'Increment',
-    //     child: const Icon(Icons.add),
-    //   ), // This trailing comma makes auto-formatting nicer for build methods.
-    // );
+          return widget.appTiles[index % widget.appTiles.length];
+        }
+      )
+    )
+    );
   }
 }
 
