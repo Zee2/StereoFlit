@@ -65,6 +65,10 @@ class FlutterSurface
 
         // Update/tick and draw the Flutter surface at the specified bounds.
         void Draw(sk::bounds_t bounds);
+
+        double GetPixelRatio() { return pixel_ratio; }
+
+        void SetPixelRatio(double ratio);
 };
 
 #endif // FLUTTER_SURFACE_HPP

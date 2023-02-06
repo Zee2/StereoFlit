@@ -43,6 +43,7 @@ int main(int argc, const char* argv[]) {
 	settings.app_name           = "SKNativeTemplate";
 	settings.assets_folder      = "Assets";
 	settings.display_preference = display_mode_mixedreality;
+    settings.blend_preference = display_blend_blend;
 	if (!sk_init(settings))
 		return 1;
 
@@ -62,8 +63,8 @@ int main(int argc, const char* argv[]) {
             newWindow.windowPose = ui_popup_pose(vec3_forward * 0.2f);
             newWindow.flutter = new FlutterSurface(
                 ("FlutterSurface" + std::to_string(num)).c_str(),
-                512, 512,
-                1.0,
+                512, 128,
+                1.0f,
                 flutter_project_path,
                 flutter_icudtl_path
             );
@@ -74,14 +75,34 @@ int main(int argc, const char* argv[]) {
 
         for (auto& window : flutterWindows)
         {
-            ui_window_begin(window.id.c_str(), window.windowPose, vec2_one * 0.3f, sk::ui_win_normal, sk::ui_move_face_user);
-            sk::bounds_t flutter_bounds = ui_layout_reserve(vec2_one * ui_layout_remaining().x);
+            sk::ui_settings_t prev_settings = sk::ui_get_settings();
+            sk::ui_settings_t new_settings = prev_settings;
+            new_settings.margin = 0.001f;
+
+            // Push the updated UI setting
+            sk::ui_settings(new_settings);
+
+            sk::vec2 flutter_size = sk::vec2(window.flutter->GetPixelWidth(), window.flutter->GetPixelHeight()) * 0.0005f;
+            
+            sk::vec2 window_size = sk::vec2(flutter_size.x + ui_get_margin() * 2, flutter_size.y + ui_get_margin() * 2);
+            ui_window_begin(window.id.c_str(), window.windowPose, window_size, sk::ui_win_body, sk::ui_move_face_user);
+            sk::bounds_t flutter_bounds = sk::ui_layout_reserve(sk::ui_layout_remaining());
+            
             flutter_bounds.center.z -= 0.001f;
             flutter_bounds.dimensions.z += 0.001f;
 
             window.flutter->Draw(flutter_bounds);
 
+            ui_label(("Pixel ratio: " + std::to_string(window.flutter->GetPixelRatio())).c_str());
+            ui_sameline();
+            float ratio = window.flutter->GetPixelRatio();
+            ui_hslider("ratioslider", ratio, 0.5f, 2.5f);
+            window.flutter->SetPixelRatio(ratio);
+
             ui_window_end();
+
+            // Pop/restore the old UI settings.
+            sk::ui_settings(prev_settings);
         }
 	});
 
