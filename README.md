@@ -2,11 +2,10 @@
 
 Stereoflit is an experimental Flutter embedder for [StereoKit](http://www.stereokit.net), the code-first Mixed Reality engine. StereoFlit allows you to run and embed a pre-bundled Dart+Flutter application as a worldspace UI layer within your StereoKit app. 
 
-<img src="https://user-images.githubusercontent.com/5544935/216882882-c8b0b8fb-ad3d-4ed7-9da8-7d5287e78775.png" height=300/><img src="https://user-images.githubusercontent.com/5544935/216883357-4ab88b14-a939-4cc8-a516-57ea4a8962ec.png" height=300/>
-
-
-https://user-images.githubusercontent.com/5544935/216883027-6c80133c-200d-4132-86a6-0f5f0ebc9a9b.mp4
-
+<p align="middle">
+<img src="https://user-images.githubusercontent.com/5544935/216882882-c8b0b8fb-ad3d-4ed7-9da8-7d5287e78775.png" width=40%/>
+<img src="https://user-images.githubusercontent.com/5544935/216883357-4ab88b14-a939-4cc8-a516-57ea4a8962ec.png" width=40%/>
+</p>
 
 ## Reqs
 
@@ -16,6 +15,8 @@ https://user-images.githubusercontent.com/5544935/216883027-6c80133c-200d-4132-8
 ## Setup
 
 Run `setup.ps1`. It should build the flutter bundle, build the StereoKit app, and launch. If you're unfamiliar with how StereoKit's simulator controls work, [check the docs here.](https://stereokit.net/Pages/Guides/Using-The-Simulator.html)
+
+<img src="https://user-images.githubusercontent.com/5544935/216883027-6c80133c-200d-4132-86a6-0f5f0ebc9a9b.mp4" width="100" height="100">
 
 ## Status
 
