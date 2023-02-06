@@ -92,7 +92,7 @@ FlutterSurface::FlutterSurface(const char* id, size_t pixel_width, size_t pixel_
     }
 
     // Setup the sk resources.
-    texture = sk::tex_create(sk::tex_type_dynamic, sk::tex_format_rgba32);
+    texture = sk::tex_create(sk::tex_type_dynamic, sk::tex_format_bgra32);
     quad_mesh = sk::mesh_find(sk::default_id_mesh_quad);
     quad_mat = sk::material_copy(sk::material_find(sk::default_id_material));
     sk::material_set_texture(quad_mat, "diffuse", texture);
