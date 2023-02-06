@@ -8,24 +8,28 @@
 #include <filesystem>
 using namespace sk;
 
-double dpi = 2.0;
-pose_t windowPose = pose_identity;
-
-sk::tex_t flutter_texture;
-
-mesh_t     quad_mesh;
-mesh_t     cube_mesh;
-material_t cube_mat;
-pose_t     cube_pose = {{0,0,-0.5f}, quat_identity};
-
-// The Flutter surface we can reference inside StereoKit.
-FlutterSurface* flutterSurface;
-
 static_assert(FLUTTER_ENGINE_VERSION == 1,
               "This Flutter Embedder was authored against the stable Flutter "
               "API at version 1. There has been a serious breakage in the "
               "API. Please read the ChangeLog and take appropriate action "
               "before updating this assertion");
+
+// Helpful container for a Flutter window,
+// to keep track of an id for the window, a pose,
+// and the handle to the FlutterSurface itself.
+typedef struct {
+    std::string id;
+    pose_t windowPose;
+    FlutterSurface* flutter;
+} flutter_window_t;
+
+std::vector<flutter_window_t> flutterWindows = { };
+
+std::string flutter_project_path;
+std::string flutter_icudtl_path;
+
+// For the main options/menu window.
+pose_t optionsWindowPose;
 
 int main(int argc, const char* argv[]) {
 
@@ -43,34 +47,49 @@ int main(int argc, const char* argv[]) {
 		return 1;
 
     // Grab the path to the flutter project and icudtl
-    std::string flutter_project_path = argv[1];
-    std::string flutter_icudtl_path = argv[2];
+    flutter_project_path = argv[1];
+    flutter_icudtl_path = argv[2];
 
-    std::cout << "Booting Flutter app at path: " << flutter_project_path << std::endl;
-
-    // FlutterSurface wraps the Flutter engine/embedder/etc,
-    // as well as performs input handling niceties for us.
-    flutterSurface = new FlutterSurface(
-        "MyFlutterSurface",
-        512, 512,
-        1.0,
-        flutter_project_path,
-        flutter_icudtl_path
-    );
+    optionsWindowPose = ui_popup_pose(vec3_forward * 0.1f);
 
     sk_run([]() {
-        ui_window_begin("Flutter", windowPose, vec2_one * 0.3f, sk::ui_win_body, sk::ui_move_face_user);
-        sk::bounds_t flutter_bounds = ui_layout_reserve(vec2_one * ui_layout_remaining().x);
-        flutter_bounds.center.z -= 0.001f;
-        flutter_bounds.dimensions.z += 0.001f;
+        ui_window_begin("Menu", optionsWindowPose);
+        if (ui_button("Spawn Flutter window"))
+        {
+            auto num = flutterWindows.empty() ? 0 : flutterWindows.size();
+            flutter_window_t newWindow;
+            newWindow.id = "FlutterWindow" + std::to_string(num);
+            newWindow.windowPose = ui_popup_pose(vec3_forward * 0.2f);
+            newWindow.flutter = new FlutterSurface(
+                ("FlutterSurface" + std::to_string(num)).c_str(),
+                512, 512,
+                1.0,
+                flutter_project_path,
+                flutter_icudtl_path
+            );
 
-        flutterSurface->Draw(flutter_bounds);
-
+            flutterWindows.push_back(newWindow);
+        }
         ui_window_end();
+
+        for (auto& window : flutterWindows)
+        {
+            ui_window_begin(window.id.c_str(), window.windowPose, vec2_one * 0.3f, sk::ui_win_normal, sk::ui_move_face_user);
+            sk::bounds_t flutter_bounds = ui_layout_reserve(vec2_one * ui_layout_remaining().x);
+            flutter_bounds.center.z -= 0.001f;
+            flutter_bounds.dimensions.z += 0.001f;
+
+            window.flutter->Draw(flutter_bounds);
+
+            ui_window_end();
+        }
 	});
 
     // FlutterSurface is in charge of freeing things.
-    delete flutterSurface;
+    for (int i = 0; i < flutterWindows.size(); i++)
+    {
+        delete flutterWindows[i].flutter;
+    }
 
     return 0;
 }
