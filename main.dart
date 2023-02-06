@@ -8,16 +8,6 @@ void main() {
   // This affects things like whether scrollbars appear, etc
   // debugDefaultTargetPlatformOverride = TargetPlatform.fuchsia;
   runApp(const MyApp());
-  var existingCallback = WidgetsBinding.instance.platformDispatcher.onPointerDataPacket;
-  WidgetsBinding.instance.platformDispatcher.onPointerDataPacket = (packet) {
-    for (var event in packet.data) {
-      print("Event x/y: ${event.physicalX}, ${event.physicalY}");
-      print("Event deltaX/Y: ${event.physicalDeltaX}, ${event.physicalDeltaY}");
-      print("Event phase: ${event.change}");
-    }
-
-    existingCallback?.call(packet);
-  };
 }
 
 // For enabling "mouse" drag scrolling.
